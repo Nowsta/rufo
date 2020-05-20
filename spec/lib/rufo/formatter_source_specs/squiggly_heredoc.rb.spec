@@ -172,8 +172,8 @@ EOF
 #~# EXPECTED
 begin
   <<~EOF
-    foo
-     bar
+  foo
+   bar
   EOF
 end
 
@@ -185,7 +185,7 @@ EOF
 
 #~# EXPECTED
 <<~EOF
-  a
+a
 EOF
 
 #~# ORIGINAL heredoc_squiggly_extra_spaces
@@ -229,7 +229,7 @@ EOF
 
 #~# EXPECTED
 <<~EOF
-  #{1}#{2}
+ #{1}#{2}
 EOF
 
 #~# ORIGINAL heredoc_squiggly_extra_spaces_5
@@ -254,8 +254,8 @@ EOF
 
 #~# EXPECTED
 <<~EOF
-  #{1}
-  #{2}
+ #{1}
+ #{2}
 EOF
 
 

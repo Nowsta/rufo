@@ -244,34 +244,14 @@ class Rufo::Formatter
       visit_string_concat node
     when :@tstring_content
       # [:@tstring_content, "hello ", [1, 1]]
-      heredoc, tilde, signal = @current_heredoc
+      heredoc, tilde = @current_heredoc
       looking_at_newline = current_token_kind == :on_tstring_content && current_token_value == "\n"
-      if heredoc && tilde && !@last_was_newline && looking_at_newline
-        check :on_tstring_content
-        consume_token_value(current_token_value)
-        next_token
-      else
-        # For heredocs with tilde we sometimes need to align the contents
-        if heredoc && tilde && @last_was_newline
-          unless (current_token_value == "\n" ||
-                  current_token_kind == :on_heredoc_end)
-            write_indent(next_indent) unless signal =~ /NO_RUFO|CSV/
-          end
-          skip_ignored_space
-          if current_token_kind == :on_tstring_content
-            check :on_tstring_content
-            consume_token_value(current_token_value)
-            next_token
-          end
-        else
-          while (current_token_kind == :on_ignored_sp) ||
-                (current_token_kind == :on_tstring_content) ||
-                (current_token_kind == :on_embexpr_beg)
-            check current_token_kind
-            break if current_token_kind == :on_embexpr_beg
-            consume_token current_token_kind
-          end
-        end
+      while (current_token_kind == :on_ignored_sp) ||
+            (current_token_kind == :on_tstring_content) ||
+            (current_token_kind == :on_embexpr_beg)
+        check current_token_kind
+        break if current_token_kind == :on_embexpr_beg
+        consume_token current_token_kind
       end
     when :string_content
       # [:string_content, exp]
@@ -591,12 +571,11 @@ class Rufo::Formatter
     # [:string_literal, [:string_content, exps]]
     heredoc = current_token_kind == :on_heredoc_beg
     tilde = current_token_value.include?("~")
-    signal = current_token_value
     if heredoc
       write current_token_value.rstrip
       # Accumulate heredoc: we'll write it once
       # we find a newline.
-      @heredocs << [node, tilde, signal]
+      @heredocs << [node, tilde]
       # Get the next_token while capturing any output.
       # This is needed so that we can add a comma if one is not already present.
       captured_output = capture_output { next_token }
@@ -1211,10 +1190,10 @@ class Rufo::Formatter
     printed = false
 
     until @heredocs.empty?
-      heredoc, tilde, signal = @heredocs.first
+      heredoc, tilde = @heredocs.first
 
       @heredocs.shift
-      @current_heredoc = [heredoc, tilde, signal]
+      @current_heredoc = [heredoc, tilde]
       visit_string_literal_end(heredoc)
       @current_heredoc = nil
       printed = true

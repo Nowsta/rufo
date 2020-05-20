@@ -388,22 +388,3 @@ foo(
     This is a heredoc
   EOF
 )
-
-#~# ORIGINAL heredoc_indentation
-
-def method
-  <<~NO_RUFO
-abc
-  a
-def
-  NO_RUFO
-end
-
-#~# EXPECTED
-def method
-  <<~NO_RUFO
-abc
-  a
-def
-  NO_RUFO
-end
